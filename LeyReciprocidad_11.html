@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Exposición Fotográfica</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        :root {
+            --primary-color: #64b5f6; /* Azul claro para acentos */
+            --secondary-color: #ff9800; /* Naranja para títulos y énfasis */
+            --background-color: #121212; /* Fondo muy oscuro */
+            --text-color: #e0e0e0; /* Texto claro */
+            --card-color: #1e1e1e; /* Color de las tarjetas */
+            --border-color: #424242; /* Borde sutil */
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--card-color);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        h1, h2 {
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-top: 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #bdbdbd; /* Gris claro para párrafos */
+            margin-bottom: 1.5rem;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .input-group, .select-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .input-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex: 1 1 250px;
+            max-width: 300px;
+        }
+        
+        label {
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--primary-color);
+        }
+
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #2c2c2c;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            cursor: pointer;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3e%3cpath d='M7 10l5 5 5-5H7z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 1.2em;
+        }
+        
+        select:hover {
+            border-color: var(--primary-color);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.2);
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.8rem 2.2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #calculate-button {
+            background-color: var(--primary-color);
+        }
+
+        #calculate-button:hover {
+            background-color: #58a5e5;
+        }
+
+        #reset-app-button {
+            background-color: #424242; /* Gris oscuro para el botón de reset */
+        }
+        
+        #reset-app-button:hover {
+            background-color: #616161;
+        }
+
+        #reset-results-button {
+            background-color: #424242;
+            margin-left: 10px;
+            padding: 0.8rem 2.2rem;
+            margin-bottom: 0;
+            align-self: flex-start;
+        }
+
+        #reset-results-button:hover {
+            background-color: #616161;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #results {
+            margin-top: 3rem;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        .result-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            margin-top: 2rem;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        li {
+            background-color: #2c2c2c;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #424242;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-align: left;
+            font-size: 1rem;
+            line-height: 1.8;
+            cursor: pointer;
+        }
+
+        li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        li strong {
+            color: var(--secondary-color);
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 0.2rem;
+        }
+        
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #no-combinations-message {
+            color: var(--secondary-color);
+            font-weight: bold;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+        
+            h1 {
+                font-size: 2rem;
+            }
+
+            .input-group, .select-container {
+                flex-direction: column;
+                gap: 0.8rem;
+                margin: 1rem 0;
+            }
+
+            /* Nueva modificación */
+            .input-item {
+                flex: none; /* Elimina la restricción flex */
+                max-width: none;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            #reset-results-button {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            li {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📸 Calculadora de Exposición</h1>
+        <p>Utiliza esta herramienta para encontrar combinaciones de exposición equivalentes, basándote en los valores de apertura, tiempo de obturación e ISO.</p>
+        
+        <h2>Valores de Exposición Base</h2>
+        <p>Selecciona los valores de tu toma inicial para calcular el valor de exposición (EV) base.</p>
+        
+        <div class="input-group">
+            <div class="input-item">
+                <label for="apertura-base">Apertura de Diafragma:</label>
+                <select id="apertura-base">
+                    <option value="" disabled selected>Selecciona una apertura</option>
+                </select>
+            </div>
+            
+            <div class="input-item">
+                <label for="tiempo-base">Tiempo de Obturación:</label>
+                <select id="tiempo-base">
+                    <option value="" disabled selected>Selecciona un tiempo</option>
+                </select>
+            </div>
+            
+            <div class="input-item">
+                <label for="iso-base">ISO:</label>
+                <select id="iso-base">
+                    <option value="" disabled selected>Selecciona un ISO</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="calculate-button">Calcular EV Base</button>
+            <button id="reset-app-button">Reiniciar</button>
+        </div>
+
+        <div id="results">
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Calculando...</p>
+            </div>
+
+            <div id="results-content" class="hidden">
+                
+                <div class="result-section" id="section-combinations">
+                    <h2>Combinaciones Recíprocas</h2>
+                    <p>Ahora, selecciona dos de los tres valores para encontrar el valor equivalente y ver las combinaciones posibles.</p>
+                    <div class="input-group" id="reciprocal-input-group">
+                        <div class="input-item">
+                            <label for="apertura-combo-select">Apertura:</label>
+                            <select id="apertura-combo-select">
+                                <option value="" disabled selected>Apertura</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="tiempo-combo-select">Tiempo:</label>
+                            <select id="tiempo-combo-select">
+                                <option value="" disabled selected>Tiempo</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="iso-combo-select">ISO:</label>
+                            <select id="iso-combo-select">
+                                <option value="" disabled selected>ISO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="reset-results-button">Reset Combinaciones</button>
+                    <ul id="combinations-list"></ul>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const aperturas = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.5, 2.8, 3.2, 3.5, 4.0, 4.5, 5.0, 5.6, 6.3, 7.1, 8, 9, 10, 11, 13, 14, 16, 18, 20, 22, 25, 29, 32];
+            const tiemposFraccion = [1/4000, 1/3200, 1/2500, 1/2000, 1/1600, 1/1250, 1/1000, 1/800, 1/640, 1/500, 1/400, 1/320, 1/250, 1/200, 1/160, 1/125, 1/100, 1/80, 1/60, 1/50, 1/40, 1/30, 1/25, 1/20, 1/15, 1/13, 1/10, 1/8, 1/6, 1/5, 1/4, 1/3, 1/2.5, 1/2, 1/1.6, 1/1.3];
+            const tiemposSegundos = [1, 1.3, 1.6, 2, 2.5, 3, 4, 5, 6, 8, 10, 13, 15, 20, 25, 30, 40, 50, 60];
+            const tiemposLargos = [80, 100, 120, 160, 200, 240, 320, 400, 480, 640, 800, 960, 1280, 1600, 1920, 2560, 3200, 3840, 5120, 6400, 7680];
+            const isos = [100, 125, 160, 200, 250, 320, 400, 500, 640, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6400, 8000, 10000, 12800];
+            
+            const aperturaBaseSelect = document.getElementById('apertura-base');
+            const tiempoBaseSelect = document.getElementById('tiempo-base');
+            const isoBaseSelect = document.getElementById('iso-base');
+            const calculateButton = document.getElementById('calculate-button');
+            const resetAppButton = document.getElementById('reset-app-button');
+            const resultsContent = document.getElementById('results-content');
+            const loadingSpinner = document.getElementById('loading');
+            
+            const aperturaComboSelect = document.getElementById('apertura-combo-select');
+            const tiempoComboSelect = document.getElementById('tiempo-combo-select');
+            const isoComboSelect = document.getElementById('iso-combo-select');
+            const resetResultsButton = document.getElementById('reset-results-button');
+            const combinationsList = document.getElementById('combinations-list');
+            
+            let baseEV = null;
+
+            function formatTiempoLargo(segundos) {
+                const minutos = Math.floor(segundos / 60);
+                const segundosRestantes = segundos % 60;
+                
+                if (minutos > 0 && segundosRestantes === 0) {
+                    return `${minutos} min`;
+                } else if (minutos > 0) {
+                    return `${minutos} min ${segundosRestantes} s`;
+                }
+                return `${segundos} s`;
+            }
+
+            const tiempoMap = new Map();
+            tiemposFraccion.forEach(t => {
+                if (t > 0) {
+                    tiempoMap.set(t, `1/${(1/t).toFixed(0)} s`);
+                }
+            });
+            tiemposSegundos.forEach(t => {
+                if (t > 0) {
+                    tiempoMap.set(t, `${t} s`);
+                }
+            });
+            tiemposLargos.forEach(t => {
+                if (t > 0) {
+                    tiempoMap.set(t, formatTiempoLargo(t));
+                }
+            });
+
+            const allTiempos = [...tiemposFraccion, ...tiemposSegundos, ...tiemposLargos].filter(t => t > 0);
+        
+            function populateSelects() {
+                [aperturaBaseSelect, aperturaComboSelect].forEach(select => {
+                    aperturas.forEach(f => {
+                        const option = document.createElement('option');
+                        option.value = f;
+                        option.textContent = `f/${f}`;
+                        select.appendChild(option);
+                    });
+                });
+        
+                [tiempoBaseSelect, tiempoComboSelect].forEach(select => {
+                    allTiempos.forEach(t => {
+                        const option = document.createElement('option');
+                        option.value = t;
+                        option.textContent = tiempoMap.get(t);
+                        select.appendChild(option);
+                    });
+                });
+        
+                [isoBaseSelect, isoComboSelect].forEach(select => {
+                    isos.forEach(i => {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = `ISO ${i}`;
+                        select.appendChild(option);
+                    });
+                });
+            }
+        
+            function calculateEV(apertura, tiempo, iso) {
+                const ev = Math.log2((apertura * apertura) / tiempo) - Math.log2(iso / 100);
+                return ev;
+            }
+        
+            function findReciprocal() {
+                if (baseEV === null) return;
+        
+                const selectedApertura = parseFloat(aperturaComboSelect.value);
+                const selectedTiempo = parseFloat(tiempoComboSelect.value);
+                const selectedISO = parseInt(isoComboSelect.value);
+                const tolerance = 0.05;
+
+                combinationsList.innerHTML = '';
+                const foundCombinations = [];
+
+                if (!isNaN(selectedApertura) && !isNaN(selectedTiempo)) {
+                    isos.forEach(iso => {
+                        if (Math.abs(calculateEV(selectedApertura, selectedTiempo, iso) - baseEV) < tolerance) {
+                            foundCombinations.push({
+                                apertura: selectedApertura,
+                                tiempo: selectedTiempo,
+                                iso: iso
+                            });
+                        }
+                    });
+                } else if (!isNaN(selectedApertura) && !isNaN(selectedISO)) {
+                    allTiempos.forEach(tiempo => {
+                        if (Math.abs(calculateEV(selectedApertura, tiempo, selectedISO) - baseEV) < tolerance) {
+                            foundCombinations.push({
+                                apertura: selectedApertura,
+                                tiempo: tiempo,
+                                iso: selectedISO
+                            });
+                        }
+                    });
+                } else if (!isNaN(selectedTiempo) && !isNaN(selectedISO)) {
+                    aperturas.forEach(apertura => {
+                        if (Math.abs(calculateEV(apertura, selectedTiempo, selectedISO) - baseEV) < tolerance) {
+                            foundCombinations.push({
+                                apertura: apertura,
+                                tiempo: selectedTiempo,
+                                iso: selectedISO
+                            });
+                        }
+                    });
+                }
+        
+                if (foundCombinations.length > 0) {
+                    foundCombinations.forEach(combo => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<strong>Apertura:</strong> f/${combo.apertura}<br>` +
+                                             `<strong>Tiempo:</strong> ${tiempoMap.get(combo.tiempo)}<br>` +
+                                             `<strong>ISO:</strong> ${combo.iso}`;
+                        combinationsList.appendChild(li);
+                    });
+                } else {
+                    combinationsList.innerHTML = `<li id="no-combinations-message">No se encontraron combinaciones para estos valores.</li>`;
+                }
+            }
+        
+            function handleComboChange() {
+                const filledCount = [aperturaComboSelect.value, tiempoComboSelect.value, isoComboSelect.value].filter(v => v !== '').length;
+                
+                if (filledCount >= 2) {
+                    [aperturaComboSelect, tiempoComboSelect, isoComboSelect].forEach(select => {
+                        if (select.value === '') {
+                            select.disabled = true;
+                        }
+                    });
+                    findReciprocal();
+                } else {
+                    [aperturaComboSelect, tiempoComboSelect, isoComboSelect].forEach(select => select.disabled = false);
+                    combinationsList.innerHTML = '';
+                }
+            }
+        
+            function resetResults() {
+                aperturaComboSelect.value = '';
+                tiempoComboSelect.value = '';
+                isoComboSelect.value = '';
+                [aperturaComboSelect, tiempoComboSelect, isoComboSelect].forEach(select => select.disabled = false);
+                combinationsList.innerHTML = '';
+            }
+        
+            function resetApp() {
+                aperturaBaseSelect.value = '';
+                tiempoBaseSelect.value = '';
+                isoBaseSelect.value = '';
+                baseEV = null;
+                resultsContent.classList.add('hidden');
+                resetResults();
+            }
+
+            async function calculateBase() {
+                const selectedApertura = parseFloat(aperturaBaseSelect.value);
+                const selectedTiempo = parseFloat(tiempoBaseSelect.value);
+                const selectedISO = parseInt(isoBaseSelect.value);
+
+                if (isNaN(selectedApertura) || isNaN(selectedTiempo) || isNaN(selectedISO)) {
+                    alert('Por favor, selecciona valores para Apertura, Tiempo e ISO.');
+                    return;
+                }
+
+                resultsContent.classList.add('hidden');
+                loadingSpinner.classList.remove('hidden');
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                baseEV = calculateEV(selectedApertura, selectedTiempo, selectedISO);
+                
+                loadingSpinner.classList.add('hidden');
+                resultsContent.classList.remove('hidden');
+            }
+        
+            calculateButton.addEventListener('click', calculateBase);
+            resetAppButton.addEventListener('click', resetApp);
+            resetResultsButton.addEventListener('click', resetResults);
+        
+            aperturaComboSelect.addEventListener('change', handleComboChange);
+            tiempoComboSelect.addEventListener('change', handleComboChange);
+            isoComboSelect.addEventListener('change', handleComboChange);
+        
+            populateSelects();
+        });
+    </script>
+</body>
+</html>
